@@ -4,8 +4,10 @@ import { useState } from "react";
 
 export default function Home() {
   const [orders, setOrders] = useState({
-    m1: "",
-    m2: "",
+    m1Ham: 0,
+    m1Crispy: 0,
+    m2Ham: 0,
+    m2Crispy: 0,
     individualHam: 0,
     individualCrispy: 0,
     individualPommes: 0,
@@ -18,31 +20,21 @@ export default function Home() {
     let crispyCount = 0;
     let pommes = 0;
 
-    if (orders.m1 === "Ham") {
-      breads += 1;
-      patties += 1;
-      pommes += 1;
-    }
-    if (orders.m1 === "Crispy") {
-      breads += 1;
-      crispyCount += 1;
-      pommes += 1;
-    }
+    // M1
+    breads += orders.m1Ham + orders.m1Crispy;
+    patties += orders.m1Ham;
+    crispyCount += orders.m1Crispy;
+    pommes += orders.m1Ham + orders.m1Crispy;
 
-    if (orders.m2 === "Ham") {
-      breads += 1;
-      patties += 2;
-      pommes += 1;
-    }
-    if (orders.m2 === "Crispy") {
-      breads += 1;
-      crispyCount += 2;
-      pommes += 1;
-    }
+    // M2
+    breads += orders.m2Ham + orders.m2Crispy;
+    patties += orders.m2Ham * 2;
+    crispyCount += orders.m2Crispy * 2;
+    pommes += orders.m2Ham + orders.m2Crispy;
 
-    breads += orders.individualHam;
+    // Individual
+    breads += orders.individualHam + orders.individualCrispy;
     patties += orders.individualHam;
-    breads += orders.individualCrispy;
     crispyCount += orders.individualCrispy;
     pommes += orders.individualPommes;
 
@@ -50,10 +42,38 @@ export default function Home() {
   };
 
   const resetOrders = () => {
-    setOrders({ m1: "", m2: "", individualHam: 0, individualCrispy: 0, individualPommes: 0 });
+    setOrders({
+      m1Ham: 0,
+      m1Crispy: 0,
+      m2Ham: 0,
+      m2Crispy: 0,
+      individualHam: 0,
+      individualCrispy: 0,
+      individualPommes: 0,
+    });
     setResult(null);
-    document.querySelectorAll("input[type=radio]").forEach((radio) => (radio.checked = false));
   };
+
+  const renderItem = (label, key) => (
+    <div className="flex items-center justify-between mb-2">
+      <span>{label}</span>
+      <div className="flex items-center gap-2">
+        <button
+          className="bg-red-500 text-white w-8 h-8 rounded"
+          onClick={() => setOrders({ ...orders, [key]: Math.max(0, orders[key] - 1) })}
+        >
+          -
+        </button>
+        <span>{orders[key]}</span>
+        <button
+          className="bg-green-500 text-white w-8 h-8 rounded"
+          onClick={() => setOrders({ ...orders, [key]: orders[key] + 1 })}
+        >
+          +
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
@@ -63,61 +83,23 @@ export default function Home() {
         {/* Menu 1 */}
         <div>
           <h2 className="font-semibold mb-2">Menu 1</h2>
-          <div className="flex gap-4">
-            <label className="flex items-center gap-2">
-              <input type="radio" name="m1" value="Ham" onChange={() => setOrders({ ...orders, m1: "Ham" })} />
-              Hamburger
-            </label>
-            <label className="flex items-center gap-2">
-              <input type="radio" name="m1" value="Crispy" onChange={() => setOrders({ ...orders, m1: "Crispy" })} />
-              Crispy
-            </label>
-          </div>
+          {renderItem("Cheese Burger", "m1Ham")}
+          {renderItem("Crispy", "m1Crispy")}
         </div>
 
         {/* Menu 2 */}
         <div>
           <h2 className="font-semibold mb-2">Menu 2</h2>
-          <div className="flex gap-4">
-            <label className="flex items-center gap-2">
-              <input type="radio" name="m2" value="Ham" onChange={() => setOrders({ ...orders, m2: "Ham" })} />
-              Hamburger
-            </label>
-            <label className="flex items-center gap-2">
-              <input type="radio" name="m2" value="Crispy" onChange={() => setOrders({ ...orders, m2: "Crispy" })} />
-              Crispy
-            </label>
-          </div>
+          {renderItem("Cheese Burger", "m2Ham")}
+          {renderItem("Crispy", "m2Crispy")}
         </div>
 
         {/* Individual Selection */}
         <div>
           <h2 className="font-semibold mb-2">Individual</h2>
-
-          {[
-            { label: "Hamburger", key: "individualHam" },
-            { label: "Crispy", key: "individualCrispy" },
-            { label: "Pommes", key: "individualPommes" },
-          ].map((item) => (
-            <div key={item.key} className="flex items-center justify-between mb-2">
-              <span>{item.label}</span>
-              <div className="flex items-center gap-2">
-                <button
-                  className="bg-red-500 text-white w-8 h-8 rounded"
-                  onClick={() => setOrders({ ...orders, [item.key]: Math.max(0, orders[item.key] - 1) })}
-                >
-                  -
-                </button>
-                <span>{orders[item.key]}</span>
-                <button
-                  className="bg-green-500 text-white w-8 h-8 rounded"
-                  onClick={() => setOrders({ ...orders, [item.key]: orders[item.key] + 1 })}
-                >
-                  +
-                </button>
-              </div>
-            </div>
-          ))}
+          {renderItem("Cheese Burger", "individualHam")}
+          {renderItem("Crispy", "individualCrispy")}
+          {renderItem("Pommes", "individualPommes")}
         </div>
 
         {/* Buttons */}
